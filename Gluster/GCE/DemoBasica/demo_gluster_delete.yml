@@ -1,0 +1,138 @@
+- name: Remove instancias Gcloud Gluster
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type: n1-standard-2
+    machine_type_node: n1-standard-1
+    zone: southamerica-east1-b
+    image: rhel-7
+    tamanho_disco: 30
+
+  tasks:
+
+
+  - name: Remove Instancia gluster1
+    gce:
+        instance_names: gluster1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster1disk01
+          mode: READ_WRITE
+        - name: gluster1disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 gluster1
+    gce_pd:
+      name: gluster1disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 gluster1
+    gce_pd:
+      name: gluster1disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Instancia gluster2
+    gce:
+        instance_names: gluster2
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster2disk01
+          mode: READ_WRITE
+        - name: gluster2disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 gluster2
+    gce_pd:
+      name: gluster2disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 gluster2
+    gce_pd:
+      name: gluster2disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Instancia gluster3
+    gce:
+        instance_names: gluster3
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster3disk01
+          mode: READ_WRITE
+        - name: gluster3disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 gluster3
+    gce_pd:
+      name: gluster3disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 gluster3
+    gce_pd:
+      name: gluster3disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+

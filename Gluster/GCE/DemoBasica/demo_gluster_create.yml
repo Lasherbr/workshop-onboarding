@@ -1,0 +1,200 @@
+- name: Cria instancias Gcloud Gluster
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type: n1-standard-2
+    machine_type_node: n1-standard-1
+    zone: southamerica-east1-b
+    image: rhel-7
+    tamanho_disco: 30
+    gluster1_private_ip: ""
+    gluster2_private_ip: ""
+    gluster3_private_ip: ""
+
+
+  tasks:
+
+  - name: Cria liberacao porta 80 e 443
+    gce_net:
+      name: default
+      fwname: "openshift-80443"
+      allowed: tcp:80,443
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 Gluster 1
+    gce_pd:
+      name: gluster1disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Gluster 1
+    gce_pd:
+      name: gluster1disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      
+  - name: Cria Disco 1 Gluster 2
+    gce_pd:
+      name: gluster2disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Gluster 2
+    gce_pd:
+      name: gluster2disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 Gluster 3
+    gce_pd:
+      name: gluster3disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Gluster 3
+    gce_pd:
+      name: gluster3disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
+  - name: Cria Instancia Gluster1
+    gce:
+        instance_names: gluster1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster1disk01
+          mode: READ_WRITE
+        - name: gluster1disk02
+          mode: READ_WRITE
+    register: gce_gluster1
+
+  - name: Cria Instancia Gluster2
+    gce:
+        instance_names: gluster2
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster2disk01
+          mode: READ_WRITE
+        - name: gluster2disk02
+          mode: READ_WRITE
+    register: gce_gluster2
+
+  - name: Cria Instancia Gluster3
+    gce:
+        instance_names: gluster3
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: gluster3disk01
+          mode: READ_WRITE
+        - name: gluster3disk02
+          mode: READ_WRITE
+    register: gce_gluster3
+
+  - name: Salva dados no grupo de inventario... gluster1
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_gluster1.instance_data }}"
+
+  - name: Seta variavel ip privado gluster1
+    set_fact:
+      gluster1_ip: "{{ item.private_ip }}"
+    with_items: "{{ gce_gluster1.instance_data }}"
+
+  - name: Seta variavel ip privado gluster2
+    set_fact:
+      gluster2_ip: "{{ item.private_ip }}"
+    with_items: "{{ gce_gluster2.instance_data }}"
+
+  - name: Seta variavel ip privado gluster3
+    set_fact:
+      gluster3_ip: "{{ item.private_ip }}"
+    with_items: "{{ gce_gluster3.instance_data }}"
+
+  - name: Salva dados no grupo de inventario... gluster2
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_gluster2.instance_data }}"
+
+
+  - name: Salva dados no grupo de inventario... gluster3
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_gluster3.instance_data }}"
+
+
+  - name: Espera por SSH habilitado...
+    wait_for:
+      delay: 1
+      host: "{{ item.public_ip }}"
+      port: 22
+      state: started
+      timeout: 30
+    with_items: "{{ gce_gluster3.instance_data }}"
+
+- name: Configura Hosts seguindo roles...
+  vars:
+   ansible_ssh_private_key_file: /home/luciano/gce.pem
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: luciano
+  roles:
+    - subscription
+    - { role: gluster, gluster1_ip_privado : "{{ hostvars['localhost']['gluster1_ip'] }}", gluster2_ip_privado : "{{ hostvars['localhost']['gluster2_ip'] }}", gluster3_ip_privado : "{{ hostvars['localhost']['gluster3_ip'] }}"  }

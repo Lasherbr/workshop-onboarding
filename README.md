@@ -1,20 +1,21 @@
-# README #
+# Repositorio demo as a code #
 
 Repositorio de nossos playbooks para demo como codigo atraves de ansible. 
 
-### What is this repository for? ###
+### Para que é este repositorio? ###
 
 * Feito para codigos ansible apenas
 * Pode utilizar qualquer tecnologia
 
-### How do I get set up? ###
+### Como devo contribuir? ###
 
-A sugestao de hierarquia é: 
-Tecnologia -> Caso de Uso
+A sugestao de hierarquia para organizacao é: 
+Tecnologia -> Nuvem -> Caso de Uso
 
 Ex:
-Gluster -> DemoBasica
-Gluster -> DemoAplicacaoPHP
+Gluster -> GCE -> DemoBasica
+Gluster -> AWS -> DemoAplicacaoPHP
+Ceph -> Azure -> ObjectStoreJavaApp
 
 ### Contribution guidelines ###
 
