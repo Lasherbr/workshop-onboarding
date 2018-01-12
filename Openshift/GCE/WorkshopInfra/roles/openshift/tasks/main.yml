@@ -1,0 +1,35 @@
+- name: "Instalando Pacotes Basicos"
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - wget 
+    - git 
+    - net-tools 
+    - bind-utils 
+    - iptables-services 
+    - bridge-utils 
+    - bash-completion 
+    - kexec-tools 
+    - sos 
+    - psacct
+    - mysql
+
+
+- name: "Instalando Docker"
+  yum:
+    name: docker
+    state: latest
+
+- name: "Editando docker start script options"
+  lineinfile:
+    path: /etc/sysconfig/docker
+    regexp: "^OPTIONS"
+    line: "OPTIONS='--insecure-registry=172.30.0.0/16 --selinux-enabled --log-opt max-size=1M --log-opt max-file=3'"
+
+- name: "Subindo docker..."
+  service:
+    name: docker
+    state: started
+    enabled: yes
+

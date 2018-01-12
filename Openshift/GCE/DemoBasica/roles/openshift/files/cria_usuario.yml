@@ -1,0 +1,8 @@
+- hosts: masters
+  tasks:
+  - name: "Criando usuario {{ user }} no Openshift"
+    shell: "oc create user {{ user }}"
+
+  - name: "Criando autenticacao httpasswd"
+    shell: "htpasswd -b /etc/origin/master/htpasswd {{ user }} redhat"
+

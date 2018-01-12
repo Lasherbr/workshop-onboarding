@@ -1,0 +1,26 @@
+- name: "Configura resolv.conf dns"
+  lineinfile:
+    path: /etc/resolv.conf
+    insertafter: '^search '
+    regexp: "^nameserver"
+    line: "nameserver 192.168.122.210"
+
+
+- name: "Configura resolv.conf Search"
+  lineinfile:
+    path: /etc/resolv.conf
+    insertafter: '^search '
+    line: "search example.com"
+
+- name: "Configura sshd"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: "PermitRootLogin yes"
+
+- name: "Reinicia sshd"
+  service:
+    name: sshd
+    state: restarted
+
+

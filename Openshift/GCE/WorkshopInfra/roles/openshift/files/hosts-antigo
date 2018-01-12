@@ -1,0 +1,57 @@
+[OSEv3:children]
+nodes
+masters
+etcd
+glusterfs
+glusterfs_registry
+
+[OSEv3:vars]
+openshift_master_cluster_public_hostname=None
+openshift_master_default_subdomain=example.com
+ansible_ssh_user=root
+openshift_master_cluster_hostname=None
+openshift_override_hostname_check=true
+deployment_type=openshift-enterprise
+openshift_disable_check=memory_availability,disk_availability
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# Gluster Related
+openshift_storage_glusterfs_namespace=glusterfs 
+openshift_storage_glusterfs_name=storage 
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_replicas=3
+
+
+openshift_hosted_registry_storage_volume_size=20Gi
+
+
+
+
+
+# host group for masters
+[masters]
+master.example.com
+
+# host group for etcd
+[etcd]
+master.example.com
+
+[glusterfs]
+master.example.com glusterfs_ip={{ openshift1_ip_privado }} glusterfs_devices='[ "/dev/sdb"]'
+node1.example.com glusterfs_ip={{ openshift2_ip_privado }} glusterfs_devices='[ "/dev/sdb"]'
+node2.example.com glusterfs_ip={{ openshift3_ip_privado }} glusterfs_devices='[ "/dev/sdb"]'
+
+
+[glusterfs_registry]
+master.example.com glusterfs_ip={{ openshift1_ip_privado }} glusterfs_devices='[ "/dev/sdd"]'
+node1.example.com glusterfs_ip={{ openshift2_ip_privado }} glusterfs_devices='[ "/dev/sdd"]'
+node2.example.com glusterfs_ip={{ openshift3_ip_privado }} glusterfs_devices='[ "/dev/sdd"]'
+
+
+# host group for nodes, includes region info
+[nodes]
+master.example.com
+node1.example.com openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
+node2.example.com openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
+infra-node1.example.com openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+

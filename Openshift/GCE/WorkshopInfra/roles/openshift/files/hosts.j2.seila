@@ -1,0 +1,76 @@
+[OSEv3:vars]
+timeout=60
+ansible_ssh_user=root
+ansible_become=true
+
+deployment_type=openshift-enterprise
+openshift_release=3.7
+openshift_clock_enabled=true
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=master.example.com
+openshift_master_cluster_public_hostname={{ openshift1_ip_privado }}
+openshift_master_default_subdomain=apps.example.com
+openshift_master_htpasswd_users={'admin': '$apr1$xySBCH36$Lzw6m81rKP/hIqJYbXUht0', 'developer': '$apr1$xySBCH36$Lzw6m81rKP/hIqJYbXUht0'}
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=40Gi
+
+openshift_hosted_metrics_deploy=true
+openshift_hosted_metrics_storage_kind=nfs
+openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_hosted_metrics_storage_nfs_directory=/exports
+openshift_hosted_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_metrics_storage_volume_name=metrics
+openshift_hosted_metrics_storage_volume_size=10Gi
+openshift_hosted_metrics_storage_labels={'storage': 'metrics'}
+
+openshift_hosted_logging_deploy=true
+openshift_hosted_logging_storage_kind=nfs
+openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
+openshift_hosted_logging_storage_nfs_directory=/exports
+openshift_hosted_logging_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_logging_storage_volume_name=logging
+openshift_hosted_logging_storage_volume_size=10Gi
+openshift_hosted_logging_storage_labels={'storage': 'logging'}
+
+openshift_disable_check="disk_availability,memory_availability"
+#Cloudforms
+openshift_cfme_install_app=true
+openshift_management_install_beta=true
+[OSEv3:children]
+lb
+masters
+etcd
+nodes
+nfs
+
+[lb]
+{{ openshift1_ip_privado }} openshift_public_hostname=master.example.com
+
+[masters]
+master.example.com
+
+[etcd]
+master.example.com
+
+[nodes]
+openshift1 openshift_node_labels="{'logging':'true','openshift_schedulable':'False','cluster': '1a15', 'region': 'master', 'zone': 'latam-1a'}"
+#master2.1a15.internal openshift_node_labels="{'logging':'true','openshift_schedulable':'False','cluster': '1a15', 'region': 'master', 'zone': 'latam-1b'}"
+#master3.1a15.internal openshift_node_labels="{'logging':'true','openshift_schedulable':'False','cluster': '1a15', 'region': 'master', 'zone': 'latam-1c'}"
+
+infra-node1 openshift_node_labels="{'logging':'true','cluster': '1a15', 'env':'infra', 'region': 'infra', 'zone': 'latam-1a'}"
+#infranode2.1a15.internal openshift_node_labels="{'logging':'true','cluster': '1a15', 'env':'infra','region': 'infra','zone': 'latam-1b'}"
+
+node1.example.com openshift_node_labels="{'logging':'true','cluster': '1a15', 'env':'app', 'region': 'primary', 'zone': 'latam-1a'}"
+node2.example.com openshift_node_labels="{'logging':'true','cluster': '1a15', 'env':'app', 'region': 'primary', 'zone': 'latam-1b'}"
+#node3.1a15.internal openshift_node_labels="{'logging':'true','cluster': '1a15', 'env':'app', 'region': 'primary', 'zone': 'latam-1c'}"
+
+[nfs]
+10.158.0.5

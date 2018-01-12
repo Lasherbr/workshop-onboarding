@@ -1,0 +1,305 @@
+- name: Remove instancias Gcloud Gluster
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type: n1-standard-2
+    machine_type_node: n1-standard-1
+    zone: southamerica-east1-b
+    image: rhel-7
+    tamanho_disco: 40
+    tamanho_disco_grande: 50
+    tamanho_disco_adicional: 50
+
+  tasks:
+
+  - name: Remove Instancia Bastion
+    gce:
+        instance_names: bastion
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: bastiondisk01
+          mode: READ_WRITE
+        - name: bastiondisk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 bastion
+    gce_pd:
+      name: bastiondisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Deleta Disco 2 bastion
+    gce_pd:
+      name: bastiondisk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Instancia master
+    gce:
+        instance_names: master1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: masterdisk01
+          mode: READ_WRITE
+        - name: masterdisk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 master
+    gce_pd:
+      name: masterdisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 master
+    gce_pd:
+      name: masterdisk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 master
+    gce_pd:
+      name: masterdisk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 master
+    gce_pd:
+      name: masterdisk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Instancia infra-node1
+    gce:
+        instance_names: infra-node1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: infranodedisk01
+          mode: READ_WRITE
+        - name: infranodedisk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 infranode
+    gce_pd:
+      name: infranodedisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 infranode
+    gce_pd:
+      name: infranodedisk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 infranode
+    gce_pd:
+      name: infranodedisk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 infranode
+    gce_pd:
+      name: infranodedisk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Instancia node1
+    gce:
+        instance_names: node1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: node1disk01
+          mode: READ_WRITE
+        - name: node1disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 node1
+    gce_pd:
+      name: node1disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 node1
+    gce_pd:
+      name: node1disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 node1
+    gce_pd:
+      name: node1disk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 node1
+    gce_pd:
+      name: node1disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+
+  - name: Remove Instancia node2
+    gce:
+        instance_names: node2
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: node1disk01
+          mode: READ_WRITE
+        - name: node1disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 node2
+    gce_pd:
+      name: node2disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 node2
+    gce_pd:
+      name: node2disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Disco 3 node2
+    gce_pd:
+      name: node2disk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 node2
+    gce_pd:
+      name: masterdisk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+

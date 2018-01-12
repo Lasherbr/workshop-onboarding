@@ -1,0 +1,22 @@
+- name: Executa Role
+  hosts: 35.198.32.188
+
+  vars:
+    ansible_ssh_private_key_file: /home/luciano/gce.pem
+  remote_user: luciano
+  become: yes
+  become_method: sudo
+  roles:
+    - php
+
+
+#  vars:
+#   ansible_ssh_private_key_file: /home/luciano/gce.pem
+#  hosts: gce_instances_ips
+#  become: yes
+##  become_method: sudo
+#  remote_user: luciano
+#  roles:
+#    - php
+#    - java
+

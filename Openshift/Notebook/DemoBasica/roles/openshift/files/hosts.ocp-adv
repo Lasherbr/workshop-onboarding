@@ -1,0 +1,64 @@
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+glusterfs
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user=root
+
+# If ansible_ssh_user is not root, ansible_become must be set to true
+#ansible_become=true
+
+# ==================================
+# Variaveis Para Install
+# ==================================
+# Subdominio
+openshift_master_default_subdomain=example.com
+
+# Desabilita checagem de pre-req de memoria e disco
+openshift_disable_check=memory_availability,disk_availability
+
+# Modo Enterprise
+openshift_deployment_type=openshift-enterprise
+
+# SDN
+openshift_portal_net=172.30.0.0/16
+
+# Autenticacao em htpasswd
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# Opcoes para docker
+openshift_docker_options="--selinux-enabled --insecure-registry 172.30.0.0/16 --log-driver json-file --log-opt max-size=1M --log-opt max-file=3"
+
+# Hosted para Gluster
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_storage_volume_size=10Gi
+openshift_hosted_registry_replicas=3
+
+
+
+
+
+# host group for masters
+[masters]
+master.example.com
+
+# host group for etcd
+[etcd]
+master.example.com
+
+# host group for nodes, includes region info
+[nodes]
+master.example.com
+node1.example.com openshift_node_labels="{'region': 'primary' }"
+node2.example.com openshift_node_labels="{'region': 'primary'}"
+infra-node1.example.com openshift_node_labels="{'region': 'infra'}"
+
+[glusterfs]
+node1.example.com glusterfs_devices='[ "/dev/sdb" ]'
+node2.example.com glusterfs_devices='[ "/dev/sdb" ]'
+infra-node1.example.com glusterfs_devices='[ "/dev/sdb" ]'
+

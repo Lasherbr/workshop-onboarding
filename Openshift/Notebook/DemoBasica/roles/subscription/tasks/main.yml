@@ -1,0 +1,20 @@
+- name: "Instala subscription-manager"
+  yum:
+    name: subscription-manager
+    state: present
+  ignore_errors: yes
+
+
+- name: "Subscreve Canal"
+  redhat_subscription:
+    state: present
+    username: "{{ user_subscription }}"
+    password: "{{ pass_subscription }}"
+    autosubscribe: yes
+
+- name: Desabilita repos
+  command: "subscription-manager repos --disable=*"
+
+- name: Habilita repositorio rpm server
+  command: subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.7-rpms" --enable="rhel-7-fast-datapath-rpms"
+

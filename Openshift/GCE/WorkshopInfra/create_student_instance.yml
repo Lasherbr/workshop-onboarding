@@ -1,0 +1,90 @@
+- name: Cria instancias Gcloud Openshift para Workshop
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: workshop@workshopocp-infra.iam.gserviceaccount.com 
+    credentials_file: /etc/ansible/local_files/gcloudws.json
+    project_id: workshopocp-infra
+    machine_type_node: n1-standard-2
+    zone: southamerica-east1-a
+    image: centos-7
+    preemptible: true
+    tamanho_disco_pequeno: 40
+    tamanho_disco_grande: 50
+    tamanho_disco_adicional: 50
+    master_private_ip: ""
+    infranode_private_ip: ""
+    node1_private_ip: ""
+
+
+  tasks:
+
+  - name: Cria liberacao porta 80 e 443
+    gce_net:
+      name: default
+      fwname: "openshift-80443"
+      allowed: tcp:80,443
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 Node 
+    gce_pd:
+      name: "{{ user }}disk01"
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: "Cria Instancia {{ user }}"
+    gce:
+        instance_names: "{{ user }}"
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: "{{ user }}disk01"
+          mode: READ_WRITE
+    register: gce_node
+
+  - name: Salva dados no grupo de inventario... usuario
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_node.instance_data }}"
+
+
+  - name: Espera por SSH habilitado...
+    wait_for:
+      delay: 1
+      host: "{{ item.public_ip }}"
+      port: 22
+      state: started
+      timeout: 30
+    with_items: "{{ gce_node.instance_data }}"
+
+
+- name: Configura Hosts seguindo roles...
+  vars:
+   ansible_ssh_private_key_file: /home/luciano/gce.pem
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: luciano
+  roles:
+#    - subscription
+    - openshift
+#    - postinstall
+

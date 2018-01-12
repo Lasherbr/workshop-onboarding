@@ -1,0 +1,27 @@
+version: v1 
+variant: openshift-enterprise 
+variant_version: 3.6
+ansible_ssh_user: luciano
+ansible_log_path: /tmp/ansible.log 
+hosts: 
+- ip: {{ openshift1_ip_privado }}
+  hostname: master-private.example.com 
+  public_ip: {{ openshift1_ip_publico }} 
+  public_hostname: master.example.com 
+  master: true 
+  node: true 
+  connect_to: {{ openshift1_ip_privado }}
+- ip: {{ openshift2_ip_privado }}
+  hostname: node1-private.example.com
+  public_ip: {{ openshift2_ip_publico }}
+  public_hostname: node1.example.com
+  node: true
+  connect_to: {{ openshift2_ip_privado }}
+- ip: {{ openshift3_ip_privado }}
+  hostname: node2-private.example.com
+  public_ip: {{ openshift3_ip_publico }}
+  public_hostname: node2.example.com
+  node: true
+  connect_to: {{ openshift3_ip_privado }}
+
+

@@ -1,0 +1,81 @@
+[OSEv3:children]
+nodes
+masters
+etcd
+#glusterfs
+#glusterfs_registry
+nfs
+
+[OSEv3:vars]
+openshift_master_cluster_public_hostname=None
+openshift_master_default_subdomain=example.com
+ansible_ssh_user=root
+openshift_master_cluster_hostname=None
+openshift_override_hostname_check=true
+deployment_type=openshift-enterprise
+openshift_disable_check=memory_availability,disk_availability
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# Gluster Related
+#openshift_storage_glusterfs_namespace=glusterfs 
+#openshift_storage_glusterfs_name=storage 
+#openshift_hosted_registry_storage_kind=glusterfs
+#openshift_hosted_registry_replicas=3
+
+
+#openshift_hosted_registry_storage_volume_size=20Gi
+
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_nfs_directory=/exports
+openshift_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_metrics_storage_volume_name=metrics
+openshift_metrics_storage_volume_size=10Gi
+
+
+openshift_logging_storage_kind=nfs
+openshift_logging_storage_access_modes=['ReadWriteOnce']
+openshift_logging_storage_nfs_directory=/exports
+openshift_logging_storage_nfs_options='*(rw,root_squash)'
+openshift_logging_storage_volume_name=logging
+openshift_logging_storage_volume_size=10Gi
+
+
+openshift_hosted_etcd_storage_kind=nfs
+openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
+openshift_hosted_etcd_storage_nfs_directory=/opt/osev3-etcd 
+openshift_hosted_etcd_storage_volume_name=etcd-vol2 
+openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+openshift_hosted_etcd_storage_volume_size=1G
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+# host group for masters
+[masters]
+master1.example.com
+
+# host group for etcd
+[etcd]
+master1.example.com
+
+[glusterfs]
+#master.example.com glusterfs_ip=10.158.0.2 glusterfs_devices='[ "/dev/sdb"]'
+#node1.example.com glusterfs_ip=10.158.0.3 glusterfs_devices='[ "/dev/sdb"]'
+#node2.example.com glusterfs_ip=10.158.0.6 glusterfs_devices='[ "/dev/sdb"]'
+
+[nfs]
+master1.example.com
+
+
+[glusterfs_registry]
+#master.example.com glusterfs_ip=10.158.0.2 glusterfs_devices='[ "/dev/sdd"]'
+#node1.example.com glusterfs_ip=10.158.0.3 glusterfs_devices='[ "/dev/sdd"]'
+#node2.example.com glusterfs_ip=10.158.0.6 glusterfs_devices='[ "/dev/sdd"]'
+
+
+# host group for nodes, includes region info
+[nodes]
+master1.example.com
+node1.example.com openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
+node2.example.com openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
+infra-node1.example.com openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+

@@ -1,0 +1,68 @@
+- name: Cria instancias Notebook Openshift
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+
+
+  tasks:
+
+  - name: Salva dados no grupo de inventario... openshift1
+    add_host:
+      hostname: "master1.example.com"
+      groupname: gce_instances_ips
+
+  - name: Seta variavel ip privado openshift1
+    set_fact:
+      openshift1_ip: "192.168.122.200"
+      openshift1_public_ip: "192.168.122.200"
+
+  - name: Seta variavel ip privado openshift2
+    set_fact:
+      openshift2_ip: "192.168.122.201"
+      openshift2_public_ip: "192.168.122.201"
+
+  - name: Seta variavel ip privado openshift3
+    set_fact:
+      openshift3_ip: "192.168.122.202"
+      openshift3_public_ip: "192.168.122.202"
+
+  - name: Seta variavel ip privado openshift4
+    set_fact:
+      openshift3_ip: "192.168.122.203"
+      openshift3_public_ip: "192.168.122.203"
+
+  - name: Salva dados no grupo de inventario... openshift2
+    add_host:
+      hostname: "node1.example.com"
+      groupname: gce_instances_ips
+
+
+  - name: Salva dados no grupo de inventario... openshift3
+    add_host:
+      hostname: "node2.example.com"
+      groupname: gce_instances_ips
+
+
+  - name: Salva dados no grupo de inventario... openshift4
+    add_host:
+      hostname: "infranode1.example.com"
+      groupname: gce_instances_ips
+
+
+
+- name: Configura Hosts seguindo roles...
+  vars:
+   ansible_ssh_private_key_file: /home/luciano/gce.pem
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: root
+  roles:
+    - subscription
+    - { role: gluster, openshift1_ip_privado : "{{ hostvars['localhost']['openshift1_ip'] }}", openshift2_ip_privado : "{{ hostvars['localhost']['openshift2_ip'] }}", openshift3_ip_privado : "{{ hostvars['localhost']['openshift3_ip'] }}" , openshift4_ip_privado : "{{ hostvars['localhost']['openshift4_ip'] }}", openshift1_ip_publico : "{{ hostvars['localhost']['openshift1_public_ip'] }}", openshift2_ip_publico : "{{ hostvars['localhost']['openshift2_public_ip'] }}", openshift3_ip_publico : "{{ hostvars['localhost']['openshift3_public_ip'] }}", openshift4_ip_publico : "{{ hostvars['localhost']['openshift4_public_ip'] }}"  }
+    - { role: openshift, openshift1_ip_privado : "{{ hostvars['localhost']['openshift1_ip'] }}", openshift2_ip_privado : "{{ hostvars['localhost']['openshift2_ip'] }}", openshift3_ip_privado : "{{ hostvars['localhost']['openshift3_ip'] }}" , openshift4_ip_privado : "{{ hostvars['localhost']['openshift4_ip'] }}", openshift1_ip_publico : "{{ hostvars['localhost']['openshift1_public_ip'] }}", openshift2_ip_publico : "{{ hostvars['localhost']['openshift2_public_ip'] }}", openshift3_ip_publico : "{{ hostvars['localhost']['openshift3_public_ip'] }}", openshift4_ip_publico : "{{ hostvars['localhost']['openshift4_public_ip'] }}"  }
+    - postinstall
+
+

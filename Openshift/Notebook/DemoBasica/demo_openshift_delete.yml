@@ -1,0 +1,265 @@
+- name: Remove instancias Gcloud Gluster
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type: n1-standard-2
+    machine_type_node: n1-standard-1
+    zone: southamerica-east1-b
+    image: rhel-7
+    tamanho_disco: 40
+    tamanho_disco_grande: 50
+    tamanho_disco_adicional: 50
+
+  tasks:
+
+
+  - name: Remove Instancia openshift1
+    gce:
+        instance_names: openshift1
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: openshift1disk01
+          mode: READ_WRITE
+        - name: openshift1disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 openshift1
+    gce_pd:
+      name: openshift1disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 openshift1
+    gce_pd:
+      name: openshift1disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 openshift1
+    gce_pd:
+      name: openshift1disk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 openshift1
+    gce_pd:
+      name: openshift1disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Instancia openshift2
+    gce:
+        instance_names: openshift2
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: openshift2disk01
+          mode: READ_WRITE
+        - name: openshift2disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 openshift2
+    gce_pd:
+      name: openshift2disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 openshift2
+    gce_pd:
+      name: openshift2disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 openshift2
+    gce_pd:
+      name: openshift2disk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 openshift2
+    gce_pd:
+      name: openshift2disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Instancia openshift3
+    gce:
+        instance_names: openshift3
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: openshift3disk01
+          mode: READ_WRITE
+        - name: openshift3disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 openshift3
+    gce_pd:
+      name: openshift3disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 openshift3
+    gce_pd:
+      name: openshift3disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 3 openshift3
+    gce_pd:
+      name: openshift3disk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 openshift3
+    gce_pd:
+      name: openshift3disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+
+  - name: Remove Instancia openshift4
+    gce:
+        instance_names: openshift4
+        machine_type: "{{ machine_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        state: "deleted"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: openshift3disk01
+          mode: READ_WRITE
+        - name: openshift3disk02
+          mode: READ_WRITE
+
+  - name: Deleta Disco 1 openshift4
+    gce_pd:
+      name: openshift4disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 2 openshift4
+    gce_pd:
+      name: openshift4disk02
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+
+  - name: Remove Disco 3 openshift4
+    gce_pd:
+      name: openshift4disk03
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+
+  - name: Remove Disco 4 openshift4
+    gce_pd:
+      name: openshift1disk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      state: "deleted"
+

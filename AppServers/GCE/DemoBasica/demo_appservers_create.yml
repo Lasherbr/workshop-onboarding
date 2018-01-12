@@ -1,0 +1,123 @@
+- name: Cria instancias PHP e Java
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type: n1-standard-2
+    machine_type_node: n1-standard-1
+    zone: southamerica-east1-b
+    image: centos-7
+    tamanho_disco: 50
+    php_private_ip: ""
+    jc_private_ip: ""
+
+
+  tasks:
+
+  - name: Cria liberacao porta 80 e 443
+    gce_net:
+      name: default
+      fwname: "openshift-80443"
+      allowed: tcp:80,443
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 Php
+    gce_pd:
+      name: phpdisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 JC
+    gce_pd:
+      name: jcdisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      
+  - name: Cria Instancia PHP
+    gce:
+        instance_names: php01
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        tags:
+         - http-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: phpdisk01
+          mode: READ_WRITE
+    register: gce_php
+
+  - name: Cria Instancia JC
+    gce:
+        instance_names: jc01
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        tags:
+         - http-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: jcdisk01
+          mode: READ_WRITE
+    register: gce_jc
+
+  - name: Salva dados no grupo de inventario... php
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_php.instance_data }}"
+
+  - name: Seta variavel ip privado php
+    set_fact:
+      php_ip: "{{ item.private_ip }}"
+    with_items: "{{ gce_php.instance_data }}"
+
+  - name: Salva dados no grupo de inventario... jc
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_jc.instance_data }}"
+
+  - name: Seta variavel ip privado jc
+    set_fact:
+      jc_ip: "{{ item.private_ip }}"
+    with_items: "{{ gce_jc.instance_data }}"
+
+  - name: Espera por SSH habilitado...
+    wait_for:
+      delay: 1
+      host: "{{ item.public_ip }}"
+      port: 22
+      state: started
+      timeout: 30
+    with_items: "{{ gce_jc.instance_data }}"
+
+- name: Configura Hosts seguindo roles...
+  vars:
+   ansible_ssh_private_key_file: /home/luciano/gce.pem
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: luciano
+  roles:
+    - php
+    - java

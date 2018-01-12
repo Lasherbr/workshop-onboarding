@@ -1,0 +1,81 @@
+- name: "Instalando Pacotes Basicos"
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - wget 
+    - git 
+    - net-tools 
+    - bind-utils 
+    - iptables-services 
+    - bridge-utils 
+    - bash-completion 
+    - kexec-tools 
+    - sos 
+    - psacct
+
+- name: "Instalando atomic-openshift-utils "
+  yum:
+    name: atomic-openshift-utils
+    state: latest
+
+
+- name: "Instalando atomic-openshift-excluder"
+  yum:
+    name: atomic-openshift-excluder
+    state: latest
+
+- name: "Instalando atomic-openshift-docker-excluder"
+  yum:
+    name: atomic-openshift-docker-excluder
+    state: latest
+
+- name: "Rodando atomic-openshift-excluder unexclude"
+  command: "atomic-openshift-excluder unexclude"
+
+- name: "Instalando Docker"
+  yum:
+    name: docker
+    state: latest
+
+
+- name: "Copiando hosts.j2 para instalacao OCP"
+  template:
+   src: "{{ role_path }}/files/hosts.ocp-semgluster"
+   dest: /etc/ansible/hosts
+
+- name: "Copiando docker-storage-setup docker"
+  copy:
+   src: "{{ role_path }}/files/docker-storage-setup"
+   dest: /etc/sysconfig/docker-storage-setup
+
+
+- name: "Rodando docker-storage-setup"
+  command: docker-storage-setup
+
+- name: "Editando docker start script options"
+  lineinfile:
+    path: /etc/sysconfig/docker
+    regexp: "^OPTIONS"
+    line: "OPTIONS='--insecure-registry=172.30.0.0/16 --selinux-enabled --log-opt max-size=1M --log-opt max-file=3'"
+
+- name: "Subindo docker..."
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+#- name: Set authorized key for user root
+#  authorized_key:
+#    user: root
+#    state: present
+#    key: "{{ role_path }}/files/id_rsa.pub"
+
+- name: "Copiando template para instalacao unnatended Openshift"
+  template:
+   src: "{{ role_path }}/files/installer.cfg.yml.j2"
+   dest: /home/luciano/installer.cfg.yml
+   owner: luciano
+
+#- name: "Executando instalacao unnatended Openshift..."
+#  command: atomic-openshift-installer -u -c /home/luciano/installer.cfg.yml install

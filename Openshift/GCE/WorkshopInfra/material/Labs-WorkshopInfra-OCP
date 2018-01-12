@@ -1,0 +1,199 @@
+= Workshop Openshift - Infraestrutura
+
+= Introdução
+
+Bem-vindo ao nosso workshop de Openshift Infra, o lado espartano de Openshift.
+
+==== Antes de prosseguir verifique se possui os requerimentos abaixo:
+
+* Notebook com acesso à Internet
+* Navagador de Internet com Firefox ou Google Chrome
+* 4 GB de memória RAM
+* Linux: Centos ou RHEL (virtualizado ou físico)
+* Chave publica de SSH para GCE
+* Apontar DNS para 35.199.99.183
+
+Para geracao de chave Publica
+    ssh-keygen
+    cat ~.ssh/id_rsa.pub
+
+No caso de Windows, pode ser utilizado Puttygen
+
+Enviar o conteudo para lscorsin@redhat.com
+
+==== Testando tudo
+
+Agora você tem os dados do ambiente e notebook funcionando. Faça um teste e tente logar em cada servidor usando putty ou ssh (linux nativo)
+
+.Tabela de usuários e senhas
+|===
+|Usuário|Senha|Função
+|admin|redhat|Cluster Admin
+|<logincriado>|redhat|Developer
+|===
+
+
+== Let's Rock
+
+30 minutos para preparativos
+
+==== LAB01 - Desmistificando docker
+
+Primeiro passo é entender como Docker funciona e seus principais componentes.
+
+===== 1 - Instalação do Docker
+ yum install docker <1>
+ systemctl start docker  <2>
+
+<1> Instala docker
+<2> Sobe Docker
+
+===== 2 - Lista Imagens Docker
+ docker images <1>
+
+<1> Lista as imagens locais do Docker
+
+===== Criando um Docker file
+ mkdir helloworld
+ cd helloworld
+ echo "FROM php:7.0-apache" >> Dockerfile <1>
+
+<1> Fonte: https://hub.docker.com/_/php/
+
+===== Construindo Imagem
+  docker build -t helloworld . <1>
+
+<1> Verifique as camadas da imagem.
+
+===== Listando as Imagens
+  docker images
+
+===== Subindo o container
+    docker run -d --name helloworld helloworld
+    docker ps
+
+===== Entrando no Container
+        docker exec -it <id container> /bin/bash
+
+
+==== LAB02 - Docs Openshift
+Aprendendo a pescar e não apenas recebendo o peixe...
+
+===== 1 - Acessar docs.openshift.com
+===== 2 - Navegar pelos menus a vontade
+===== 3 - Acessar Installation and Configuration > Installing a Cluster > Advanced Installation
+
+==== LAB03 - Instalando OCP
+Demo da instalacao avançada e instalacao do OC Cluster UP
+
+===== 1 - Assistir a demo
+===== 2 - Instalar o OC Cluster UP
+ yum install centos-release-openshift-origin
+ yum install origin-clients
+
+===== 3 - Fixa problemas com docker
+  vi /etc/sysconfig/docker
+  systemctl start docker
+
+ Editar a linha de OPTIONS e adicionar --insecure-registry 172.30.0.0/1
+ Ex:OPTIONS='--selinux-enabled --log-driver=journald --signature-verification=false --insecure-registry 172.30.0.0/16'
+
+===== 4 - Sobe OC cluster up
+
+ oc cluster up --public-hostname=<ip publico>
+
+===== 5 - Criar novo projeto
+
+  Acessa a interface com <logincriado> <senha redhat> https://openshift.example.com:8443
+  Clicar no botao "Create Project" e crie um projeto com o <logincriado>
+
+  Caso a instalacao tenha sido feita na propria maquina, Acessar https://ipdoservidor:8443 e entrar com login developer e senha  qualquer
+
+===== 6 - Cria nova app
+
+    Acessa o objeto criado
+    Clicar no botao "Browse Catalog"
+    Selecione php
+    Selecione seu projeto, versao do php desejada e em git repository coloque:
+    https://bitbucket.org/redhatbsb/phpapp.git
+    Caso tenha erro em deployment, executar: oc adm policy add-scc-to-user anyuid -z default -n <nomedoprojeto>
+
+==== LAB04 - Usando OC Cli
+Usando a ferramenta OC para conectar ao cluster e depurar problemas
+
+===== 1 - Login no Cluster
+
+ oc login https://openshift.example.com:8443 <1>
+
+<1> Entrar com <logincriado> e senha redhat 
+
+===== 2 - Cria novo projeto
+
+ oc new-project <seu login>
+ oc new-app https://redhatbsb@bitbucket.org/redhatbsb/docker-phpapp.git --strategy=docker
+
+===== 3 - Usar OC para navegar no projeto
+
+  oc get all
+  oc get pods
+
+===== 4 - Depurar erros do pod
+
+ oc describe pod <nome do pod>
+ oc get events
+ oc logs <nome do pod>
+
+ ==== LAB05 - Networking
+ Usando a ferramenta OC para conectar ao cluster e testar comunicacao de rede
+
+ ===== 1 - Login no Cluster
+
+  oc login https://35.198.6.223:8443 <1>
+
+===== 2 - Scale up pod para duas replicas
+
+   oc get all
+   oc scale deploymentconfig docker-phpapp --replicas=2
+
+===== 3 - Verifica configuracoes IP
+
+   oc describe pod <nome do pod> | grep IP
+
+===== 4 - Ping entre containers
+
+      oc describe pod <nome do pod> | grep IP
+      oc rsh <nome do pod>
+      # ping <ip do outro pod>
+
+
+==== LAB06 - Storage Persistente
+Usando a ferramenta OC para conectar ao cluster e visualizar configuracoes de rede
+
+ 1 - Acessa Interface Web
+ 2 - Acessa Deployment config e seleciona Actions -> Add Storage
+ 3 - Cria um Storage Claim
+ 4 - Lista claims usando oc
+ oc get pvc
+ 5 - Visualiza pod travado
+ 6 - Cria-se pv para dar suporte ao pvc
+
+
+Sintaxe criacao PV
+
+ apiVersion: v1
+ kind: PersistentVolume
+ metadata:
+  name: pv0001
+ spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  nfs:
+    path: /tmp
+    server: 172.17.0.2
+  persistentVolumeReclaimPolicy: Recycle
+
+Para criacao do pv:
+
+  oc create -f pv.yaml

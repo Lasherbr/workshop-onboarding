@@ -1,0 +1,72 @@
+- name: Habilita repositorio gluster
+  command: "subscription-manager repos --enable=rh-gluster-3-for-rhel-7-server-rpms"
+
+- name: "Instala pacote Gluster"
+  yum:
+    name: redhat-storage-server
+    state: latest
+
+#- name: "Inicia Servico Gluster"
+#  service:
+#    name: glusterd
+#    state: started
+
+#- name: "Cria Particao..."
+#  parted:
+#    device: /dev/sdb
+#    number: 1
+#    state: present
+
+#- name: "Formata como XFS"
+#  filesystem:
+#    fstype: xfs
+#    dev: /dev/sdb1
+
+#- name: "Cria diretorio para Brick"
+#  file:
+#   path: /data/brick1
+#   state: directory
+#   mode: 0755
+
+#- name: "Insere em fstab..."
+#  shell:  "echo '/dev/sdb1 /data/brick1 xfs defaults 1 2' >> /etc/fstab"
+
+#- name: "Monta brick..."
+#  mount:
+#    path: /data/brick1
+#    src: /dev/sdb1
+#    fstype: xfs
+#    opts: rw
+#    state: mounted
+
+#- name: "Cria diretorio para Volume Replica"
+#  file:
+#   path: /data/brick1/replica1
+#   state: directory
+#   mode: 0755
+
+#- name: "Cria diretorio para Volume Distribuido"
+#  file:
+#   path: /data/brick1/distributed1
+#   state: directory
+#   mode: 0755
+
+#- name: "Cria diretorio para Volume Striped"
+#  file:
+#   path: /data/brick1/striped1
+#   state: directory
+#   mode: 0755
+
+
+
+
+#- name: Adiciona gluster1 no cluster
+#  shell: "gluster peer probe {{ openshift1_ip_privado }}"
+
+#- name: Adiciona gluster2 no cluster
+#  shell: "gluster peer probe {{ openshift2_ip_privado }}"
+
+#- name: Adiciona gluster3 no cluster
+#  shell: "gluster peer probe {{ openshift3_ip_privado }}"
+
+
