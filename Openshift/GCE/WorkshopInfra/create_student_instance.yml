@@ -18,20 +18,16 @@
     infranode_private_ip: ""
     node1_private_ip: ""
 
+  vars_prompt:
+  - name: "user"
+    prompt: "Digite o login do estudante para criacao da instancia:"
+    private: no
 
   tasks:
 
-  - name: Cria liberacao porta 80 e 443
-    gce_net:
-      name: default
-      fwname: "openshift-80443"
-      allowed: tcp:80,443
-      state: "present"
-      service_account_email: "{{ service_account_email }}"
-      credentials_file: "{{ credentials_file }}"
-      project_id: "{{ project_id }}"
 
-  - name: Cria Disco 1 Node 
+
+  - name: "Cria Disco 1 instancia {{ user }}"
     gce_pd:
       name: "{{ user }}disk01"
       image: "{{ image }}"
