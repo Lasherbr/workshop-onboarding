@@ -125,20 +125,28 @@
       timeout: 30
     with_items: "{{ gce_node.instance_data }}"
 
-  - name: Cria time tower
-    tower_team:
-      name: "Timex"
-      description: "Timex descricao"
-      organization: "Workshop Ansible"
+  - name: Adiciona usuario no tower
+    tower_user:
+      username: "{{ user }}"
+      password: redhat
+      email: usuario@redhat.com
+      first_name: "{{ user }}"
+      last_name: RedHat
       state: present
       tower_config_file: "tower_cli.cfg"
 
-- name: Configura Hosts seguindo roles...
+
+  - name: "Seta variaveis para proximos passos"
+    set_fact: 
+      chave_ssh: "{{ chave_ssh }}"
+      usuario_ssh_gce: "{{ usuario_ssh_gce }}"
+
+- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
   vars:
-   ansible_ssh_private_key_file: /Users/lucianoscorsin/.ssh/id_rsa
+   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
   hosts: gce_instances_ips
   become: yes
   become_method: sudo
-  remote_user: lucianoscorsin
+  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
   roles:
     - postinstall

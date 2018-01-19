@@ -1,3 +1,5 @@
 service_account_email: adminwsansible@workshopansiblecoreandtower.iam.gserviceaccount.com 
-credentials_file: /Volumes/Dados/RedHat/WorkshopAnsible/workshop-ansible/gce.json
+credentials_file: /home/luciano/gce.json
 project_id: workshopansiblecoreandtower 
+chave_ssh: /home/luciano/.ssh/gce
+usuario_ssh_gce: luciano
