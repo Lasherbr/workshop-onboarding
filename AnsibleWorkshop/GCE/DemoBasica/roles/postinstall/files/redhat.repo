@@ -1,0 +1,4 @@
+[redhat]
+name=Repositorio Workshop Ansible
+baseurl=http://centos7-repos/repos/centos/7/
+gpgcheck=0

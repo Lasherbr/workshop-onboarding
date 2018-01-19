@@ -1,6 +1,0 @@
-- name: "Instala Java JDK"
-  yum:
-    name: java-1.6.0-openjdk-devel
-    state: latest
-
-

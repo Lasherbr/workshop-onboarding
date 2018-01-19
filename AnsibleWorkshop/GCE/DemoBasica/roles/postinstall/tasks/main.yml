@@ -1,0 +1,39 @@
+- name:  Cria usuario ansible-core
+  user:
+    name: ansible-core
+    comment: "Ansible Core"
+    uid: 2222
+
+- name: Cria diretorio ansible-core
+  file:
+    path: /ansible-core
+    state: directory
+    owner: ansible-core
+
+- name: Cria diretorio ansible-core/templates
+  file:
+    path: /ansible-core/templates
+    state: directory
+    owner: ansible-core
+
+- name: "Copiando chaves de ssh privada"
+  copy:
+   src: "{{ role_path }}/files/id_rsa"
+   dest: /ansible-core/chave
+   owner: ansible-core
+   mode: 0600
+
+- name: "Copiando arquivo de repositorio"
+  copy:
+   src: "{{ role_path }}/files/redhat.repo"
+   dest: /ansible-core/redhat.repo
+
+- name: "Copiando arquivo de fix para repo"
+  copy:
+   src: "{{ role_path }}/files/fix_repo_local.yml"
+   dest: /ansible-core/fix_repo_local.yml
+
+- name: "Copiando arquivo httpd.conf para repo"
+  copy:
+   src: "{{ role_path }}/files/httpd.conf.j2"
+   dest: /ansible-core/templates/httpd.conf.j2

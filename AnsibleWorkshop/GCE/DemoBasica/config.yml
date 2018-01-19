@@ -1,0 +1,3 @@
+service_account_email: adminwsansible@workshopansiblecoreandtower.iam.gserviceaccount.com 
+credentials_file: /Volumes/Dados/RedHat/WorkshopAnsible/workshop-ansible/gce.json
+project_id: workshopansiblecoreandtower 
