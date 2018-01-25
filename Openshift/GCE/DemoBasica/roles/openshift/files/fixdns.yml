@@ -1,0 +1,32 @@
+- hosts: all
+  tasks: 
+  - name: Remove chattr de /etc/resolv.conf
+    shell: "chattr -i /etc/resolv.conf"
+
+  - name: Altera Linha e adiciona cluster.local
+    lineinfile:
+      path: /etc/resolv.conf
+      regexp: '^search'
+      line: 'search svc.cluster.local cluster.local example.com'
+
+  - name: Altera nameserver para local
+    lineinfile:
+      path: /etc/resolv.conf
+      regexp: '^nameserver'
+      line: 'nameserver {{ hostvars[inventory_hostname].ansible_default_ipv4.address }}'
+
+     
+  - name: Altera dnsmasq.conf para incluir resolucao de example.com
+    lineinfile:
+     path: /etc/dnsmasq.conf
+     regexp: "^server="
+     line: "server=/example.com/10.158.0.5"
+
+  - name: Retorna chattr de /etc/resolv.conf
+    shell: "chattr +i /etc/resolv.conf"
+
+  - name: Restart dnsmasq
+    service:
+      name: dnsmasq
+      state: restarted
+

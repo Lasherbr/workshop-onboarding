@@ -52,13 +52,10 @@
    group: root
    mode: 0600
 
-- name: "Copiando chaves de ssh publica"
+- name: "Copiando fix de dns para posterior a instalacao do cluster"
   copy:
-   src: "{{ role_path }}/files/id_rsa.pub"
-   dest: /root/.ssh/id_rsa.pub
-   owner: root
-   group: root
-   mode: 0644
+   src: "{{ role_path }}/files/fixdns.yml"
+   dest: /etc/ansible/fixdns.yaml
 
 - name: "Copiando playbook de criacao de usuarios"
   copy:
