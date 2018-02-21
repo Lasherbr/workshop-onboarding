@@ -29,23 +29,12 @@
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
 
-  - name: "Cria Disco 1 instancia {{ user }}"
-    gce_pd:
-      name: "{{ user }}disk02"
-      size_gb: "{{ tamanho_disco_pequeno }}"
-      zone: "{{ zone  }}"
-      service_account_email: "{{ service_account_email }}"
-      credentials_file: "{{ credentials_file }}"
-      project_id: "{{ project_id }}"
-
-
   - name: "Cria Instancia {{ user }}"
     gce:
         instance_names: "{{ user }}"
         machine_type: "{{ machine_type_node }}"
         image: "{{ image }}"
         zone: "{{ zone }}"
-        preemptible: "{{ preemptible }}"
         tags:
          - http-server
          - https-server
@@ -55,9 +44,8 @@
         disks:
         - name: "{{ user }}disk01"
           mode: READ_WRITE
-        - name: "{{ user }}disk02"
-          mode: READ_WRITE
     register: gce_node
+
 
   - name: Salva dados no grupo de inventario... usuario
     add_host:
@@ -65,6 +53,10 @@
       groupname: gce_instances_ips
     with_items: "{{ gce_node.instance_data }}"
 
+  - name: Grava IP da instancia na variavel ip_publico
+    set_fact:
+      ip_publico: "{{ item.public_ip }}"
+    with_items: "{{ gce_node.instance_data }}"
 
   - name: Espera por SSH habilitado...
     wait_for:
@@ -80,12 +72,40 @@
       chave_ssh: "{{ chave_ssh }}"
       usuario_ssh_gce: "{{ usuario_ssh_gce }}"
 
-- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
-  vars:
-   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
-  hosts: gce_instances_ips
-  become: yes
-  become_method: sudo
-  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
-  roles:
-    - postinstall
+  - name: Login no cluster Openshift
+    shell: "/usr/local/bin/oc login https://{{ cluster_openshift }}:8443 --token={{ token_openshift }} --insecure-skip-tls-verify"
+
+  - name: Escolhe projeto
+    shell: "/usr/local/bin/oc project {{ nome_projeto_openshift }}"
+
+  - name: Definindo dominio para web-workshop
+    set_fact:
+     dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
+
+  - name: Cria deployment web_workshop
+    shell: "/usr/local/bin/oc new-app IP_CLUSTER_OCP={{ cluster_openshift }} NOME_WORKSHOP={{ nome_workshop  }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
+
+  - name: Cria rota para acesso ao web-workshop...
+    shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
+
+  - name: Envia email com dados para acesso
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: "{{ email_remetente }}"
+      password: "{{ senha_email }}"
+      to: "<{{ email_aluno }}>"
+      subject: "Dados para Workshop {{ nome_workshop }}"
+      body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}.'
+    delegate_to: localhost
+
+#- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
+#  vars:
+#   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
+#  hosts: gce_instances_ips
+#  become: yes
+#  become_method: sudo
+#  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
+#  roles:
+#    - postinstall
+
