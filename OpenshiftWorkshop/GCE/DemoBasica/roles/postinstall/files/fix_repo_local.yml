@@ -1,0 +1,15 @@
+---     
+- name: Habilita Repositorio Local
+  hosts: all
+  become: yes
+  vars:
+  remote_user: ansible-core 
+
+  tasks:
+  - name: Remove repositorios originais
+    shell: "for i in $(ls /etc/yum.repos.d/*.repo); do mv $i $i.orig; done"
+
+  - name: Copia conf para repos local 
+    copy:
+      src: /ansible-core/redhat.repo
+      dest: /etc/yum.repos.d/redhat.repo

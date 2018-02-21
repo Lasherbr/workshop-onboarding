@@ -1,0 +1,5 @@
+service_account_email: workshop@workshopocp-infra.iam.gserviceaccount.com
+credentials_file: /etc/ansible/local_files/gcloudws.json
+project_id: workshopocp-infra
+chave_ssh: /home/luciano/gce.pem
+usuario_ssh_gce: luciano

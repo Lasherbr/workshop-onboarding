@@ -1,0 +1,409 @@
+- name: Cria instancias Gcloud Openshift
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: conta1@infra-as-code.iam.gserviceaccount.com
+    credentials_file: /etc/ansible/local_files/gcloud.json
+    project_id: infra-as-code
+    machine_type_master: n1-standard-4
+    machine_type_node: n1-standard-2
+    zone: southamerica-east1-b
+    image: rhel-7
+    preemptible: false
+    tamanho_disco_pequeno: 40
+    tamanho_disco_grande: 50
+    tamanho_disco_adicional: 50
+    master_private_ip: ""
+    infranode_private_ip: ""
+    node1_private_ip: ""
+
+
+  tasks:
+
+  - name: Cria liberacao porta 80 e 443
+    gce_net:
+      name: default
+      fwname: "openshift-80443"
+      allowed: tcp:80,443
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 1 Master1
+    gce_pd:
+      name: masterdisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Master1
+    gce_pd:
+      name: masterdisk02
+      size_gb: "{{ tamanho_disco_grande }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      
+  - name: Cria Disco 3 Master1
+    gce_pd:
+      name: masterdisk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 4 Master1
+    gce_pd:
+      name: masterdisk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
+  - name: Cria Disco 1 Node1
+    gce_pd:
+      name: node1disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Node1
+    gce_pd:
+      name: node1disk02
+      size_gb: "{{ tamanho_disco_grande }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 3 Node1
+    gce_pd:
+      name: node1disk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 4 Node1
+    gce_pd:
+      name: node1disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
+
+  - name: Cria Disco 1 Node2
+    gce_pd:
+      name: node2disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Node2
+    gce_pd:
+      name: node2disk02
+      size_gb: "{{ tamanho_disco_grande }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 3 Node2
+    gce_pd:
+      name: node2disk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 4 Node2
+    gce_pd:
+      name: node2disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
+  - name: Cria Disco 1 Node3
+    gce_pd:
+      name: node3disk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Node3
+    gce_pd:
+      name: node3disk02
+      size_gb: "{{ tamanho_disco_grande }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 3 Node3
+    gce_pd:
+      name: node3disk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 4 Node3
+    gce_pd:
+      name: node3disk04
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
+  - name: Cria Disco Bastion
+    gce_pd:
+      name: bastiondisk01
+      image: "{{ image }}"
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 2 Bastion
+    gce_pd:
+      name: bastiondisk02
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Disco 3 Bastion
+    gce_pd:
+      name: bastiondisk03
+      size_gb: "{{ tamanho_disco_adicional }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+  - name: Cria Instancia Bastion
+    gce:
+        instance_names: bastion
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: bastiondisk01
+          mode: READ_WRITE
+        - name: bastiondisk02
+          mode: READ_WRITE
+        - name: bastiondisk03
+          mode: READ_WRITE
+    register: gce_bastion
+
+
+  - name: Cria Instancia Master1
+    gce:
+        instance_names: master1
+        machine_type: "{{ machine_type_master }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: masterdisk01
+          mode: READ_WRITE
+        - name: masterdisk02
+          mode: READ_WRITE
+        - name: masterdisk03
+          mode: READ_WRITE
+        - name: masterdisk04
+          mode: READ_WRITE
+    register: gce_master
+
+  - name: Cria Instancia Node1
+    gce:
+        instance_names: node1
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: node1disk01
+          mode: READ_WRITE
+        - name: node1disk02
+          mode: READ_WRITE
+        - name: node1disk03
+          mode: READ_WRITE
+        - name: node1disk04
+          mode: READ_WRITE
+    register: gce_node1
+
+  - name: Cria Instancia Node2
+    gce:
+        instance_names: node2
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: node2disk01
+          mode: READ_WRITE
+        - name: node2disk02
+          mode: READ_WRITE
+        - name: node2disk03
+          mode: READ_WRITE
+        - name: node2disk04
+          mode: READ_WRITE
+    register: gce_node2
+
+  - name: Cria Instancia Node3
+    gce:
+        instance_names: node3
+        machine_type: "{{ machine_type_node }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        preemptible: "{{ preemptible }}"
+        tags:
+         - http-server
+         - https-server
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        disks:
+        - name: node3disk01
+          mode: READ_WRITE
+        - name: node3disk02
+          mode: READ_WRITE
+        - name: node3disk03
+          mode: READ_WRITE
+        - name: node3disk04
+          mode: READ_WRITE
+    register: gce_node3
+
+
+
+  - name: Salva dados no grupo de inventario... master
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_master.instance_data }}"
+
+  - name: Seta variavel ip privado master
+    set_fact:
+      master_ip: "{{ item.private_ip }}"
+      master_public_ip: "{{ item.public_ip }}"
+    with_items: "{{ gce_master.instance_data }}"
+
+  - name: Salva dados no grupo de inventario... bastion
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_bastion.instance_data }}"
+
+  - name: Seta variavel ip privado node1
+    set_fact:
+      node1_ip: "{{ item.private_ip }}"
+      node1_public_ip: "{{ item.public_ip }}"
+    with_items: "{{ gce_node1.instance_data }}"
+
+  - name: Seta variavel ip privado node2
+    set_fact:
+      node1_ip: "{{ item.private_ip }}"
+      node1_public_ip: "{{ item.public_ip }}"
+    with_items: "{{ gce_node2.instance_data }}"
+
+
+  - name: Salva dados no grupo de inventario... node1
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_node1.instance_data }}"
+
+
+  - name: Salva dados no grupo de inventario... node2
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_node2.instance_data }}"
+
+  - name: Salva dados no grupo de inventario... node3
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: gce_instances_ips
+    with_items: "{{ gce_node3.instance_data }}"
+
+
+  - name: Espera por SSH habilitado...
+    wait_for:
+      delay: 1
+      host: "{{ item.public_ip }}"
+      port: 22
+      state: started
+      timeout: 30
+    with_items: "{{ gce_node2.instance_data }}"
+
+- name: Configura Hosts seguindo roles...
+  vars:
+   ansible_ssh_private_key_file: /home/luciano/gce.pem
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: luciano
+  roles:
+    - subscription
+    - gluster
+    - openshift
+    - postinstall
+

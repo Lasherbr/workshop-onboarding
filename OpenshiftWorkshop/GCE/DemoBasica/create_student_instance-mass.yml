@@ -3,7 +3,7 @@
   connection: local
   gather_facts: no
   vars:
-    machine_type_node: n1-standard-2
+    machine_type_node: n1-standard-1
     zone: southamerica-east1-a
     image: centos-7
     preemptible: true
@@ -13,11 +13,6 @@
     master_private_ip: ""
     infranode_private_ip: ""
     node1_private_ip: ""
-
-  vars_prompt:
-  - name: "user"
-    prompt: "Digite o login do estudante para criacao da instancia:"
-    private: no
 
   tasks:
 
@@ -34,6 +29,16 @@
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
 
+  - name: "Cria Disco 1 instancia {{ user }}"
+    gce_pd:
+      name: "{{ user }}disk02"
+      size_gb: "{{ tamanho_disco_pequeno }}"
+      zone: "{{ zone  }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+
   - name: "Cria Instancia {{ user }}"
     gce:
         instance_names: "{{ user }}"
@@ -49,6 +54,8 @@
         project_id: "{{ project_id }}"
         disks:
         - name: "{{ user }}disk01"
+          mode: READ_WRITE
+        - name: "{{ user }}disk02"
           mode: READ_WRITE
     register: gce_node
 
@@ -68,18 +75,17 @@
       timeout: 30
     with_items: "{{ gce_node.instance_data }}"
 
+  - name: "Seta variaveis para proximos passos"
+    set_fact: 
+      chave_ssh: "{{ chave_ssh }}"
+      usuario_ssh_gce: "{{ usuario_ssh_gce }}"
 
-#  - name: "Seta variaveis para proximos passos"
-#    set_fact: 
-#      chave_ssh: "{{ chave_ssh }}"
-#      usuario_ssh_gce: "{{ usuario_ssh_gce }}"
-
-#- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
-#  vars:
-#   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
-#  hosts: gce_instances_ips
-#  become: yes
-#  become_method: sudo
-#  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
-#  roles:
-#    - postinstall
+- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
+  vars:
+   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
+  hosts: gce_instances_ips
+  become: yes
+  become_method: sudo
+  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
+  roles:
+    - postinstall

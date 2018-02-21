@@ -3,8 +3,7 @@ credentials_file: /home/luciano/gce.json
 project_id: workshopansiblecoreandtower 
 chave_ssh: /home/luciano/.ssh/gce
 usuario_ssh_gce: luciano
-endereco_tower: https://35.198.12.187
 cluster_openshift: 35.198.59.232
 nome_projeto_openshift: workshop
 token_openshift: oVFSr-EykbRvVyaofBjaUAEWTzfkqO2DHiy2LC_5m4I
-email_remetente: redhatbsb@gmail.com
+email_remetente: redhatbsb@gmail.com 

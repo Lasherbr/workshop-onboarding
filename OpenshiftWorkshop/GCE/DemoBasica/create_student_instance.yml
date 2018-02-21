@@ -4,7 +4,6 @@
   gather_facts: no
   vars:
     machine_type_node: n1-standard-1
-    machine_type_small: g1-small
     zone: southamerica-east1-a
     image: centos-7
     preemptible: true
@@ -26,8 +25,6 @@
     prompt: "Digite o email do estudante"
     private: no
 
-
-
   tasks:
 
   - name: Carregando variaveis de config.yml
@@ -43,34 +40,12 @@
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
 
-  - name: "Cria Disco 1 instancia {{ user }}-server1"
-    gce_pd:
-      name: "{{ user }}disk02"
-      image: "{{ image }}"
-      size_gb: "{{ tamanho_disco_pequeno }}"
-      zone: "{{ zone  }}"
-      service_account_email: "{{ service_account_email }}"
-      credentials_file: "{{ credentials_file }}"
-      project_id: "{{ project_id }}"
-
-  - name: "Cria Disco 1 instancia {{ user }}-server2"
-    gce_pd:
-      name: "{{ user }}disk03"
-      image: "{{ image }}"
-      size_gb: "{{ tamanho_disco_pequeno }}"
-      zone: "{{ zone  }}"
-      service_account_email: "{{ service_account_email }}"
-      credentials_file: "{{ credentials_file }}"
-      project_id: "{{ project_id }}"
-
-
   - name: "Cria Instancia {{ user }}"
     gce:
         instance_names: "{{ user }}"
         machine_type: "{{ machine_type_node }}"
         image: "{{ image }}"
         zone: "{{ zone }}"
-        preemptible: "{{ preemptible }}"
         tags:
          - http-server
          - https-server
@@ -82,41 +57,6 @@
           mode: READ_WRITE
     register: gce_node
 
-  - name: "Cria Instancia {{ user }}-server1"
-    gce:
-        instance_names: "{{ user }}-server1"
-        machine_type: "{{ machine_type_small }}"
-        image: "{{ image }}"
-        zone: "{{ zone }}"
-        external_ip: none
-        preemptible: "{{ preemptible }}"
-        tags:
-         - http-server
-         - https-server
-        service_account_email: "{{ service_account_email }}"
-        credentials_file: "{{ credentials_file }}"
-        project_id: "{{ project_id }}"
-        disks:
-        - name: "{{ user }}disk02"
-          mode: READ_WRITE
-
-  - name: "Cria Instancia {{ user }}-server2"
-    gce:
-        instance_names: "{{ user }}-server2"
-        machine_type: "{{ machine_type_small }}"
-        image: "{{ image }}"
-        zone: "{{ zone }}"
-        external_ip: none
-        preemptible: "{{ preemptible }}"
-        tags:
-         - http-server
-         - https-server
-        service_account_email: "{{ service_account_email }}"
-        credentials_file: "{{ credentials_file }}"
-        project_id: "{{ project_id }}"
-        disks:
-        - name: "{{ user }}disk03"
-          mode: READ_WRITE
 
   - name: Salva dados no grupo de inventario... usuario
     add_host:
@@ -139,7 +79,7 @@
     with_items: "{{ gce_node.instance_data }}"
 
   - name: "Seta variaveis para proximos passos"
-    set_fact:
+    set_fact: 
       chave_ssh: "{{ chave_ssh }}"
       usuario_ssh_gce: "{{ usuario_ssh_gce }}"
 
@@ -154,36 +94,10 @@
      dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
 
   - name: Cria deployment web_workshop
-    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
+    shell: "/usr/local/bin/oc new-app ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
 
   - name: Cria rota para acesso ao web-workshop...
     shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
-
-
-  - name: Adiciona usuario no tower
-    tower_user:
-      username: "{{ user }}"
-      password: redhat
-      email: "{{ email_aluno }}"
-      first_name: "{{ user }}"
-      last_name: RedHat
-      state: present
-      tower_config_file: "tower_cli.cfg"
-
-
-#  - name: Adiciona usuario na equipe Equipe Inicial
-#    tower_role:
-#      user: "{{ user }}"
-#      target_team: "Equipe Inicial"
-#      role: member
-#      state: present
-#      tower_config_file: "tower_cli.cfg"
-
-
-  - name: "Seta variaveis para proximos passos"
-    set_fact: 
-      chave_ssh: "{{ chave_ssh }}"
-      usuario_ssh_gce: "{{ usuario_ssh_gce }}"
 
   - name: Envia email com dados para acesso
     mail:
@@ -196,14 +110,13 @@
       body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}.'
     delegate_to: localhost
 
-
-- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
-  vars:
-   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
-  hosts: gce_instances_ips
-  become: yes
-  become_method: sudo
-  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
-  roles:
-    - postinstall
+#- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
+#  vars:
+#   ansible_ssh_private_key_file: "{{ hostvars['localhost']['chave_ssh'] }}"
+#  hosts: gce_instances_ips
+#  become: yes
+#  become_method: sudo
+#  remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
+#  roles:
+#    - postinstall
 

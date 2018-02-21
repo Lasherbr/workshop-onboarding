@@ -4,7 +4,6 @@
   gather_facts: no
   vars:
     machine_type_node: n1-standard-1
-    machine_type_small: g1-small
     zone: southamerica-east1-a
     image: centos-7
     preemptible: true
@@ -14,19 +13,6 @@
     master_private_ip: ""
     infranode_private_ip: ""
     node1_private_ip: ""
-
-  vars_prompt:
-  - name: "senha_email"
-    prompt: "Digite a senha de seu email gmail"
-    private: yes
-  - name: "user"
-    prompt: "Digite o login do estudante para criacao da instancia"
-    private: no
-  - name: "email_aluno"
-    prompt: "Digite o email do estudante"
-    private: no
-
-
 
   tasks:
 
@@ -85,7 +71,7 @@
   - name: "Cria Instancia {{ user }}-server1"
     gce:
         instance_names: "{{ user }}-server1"
-        machine_type: "{{ machine_type_small }}"
+        machine_type: "{{ machine_type_node }}"
         image: "{{ image }}"
         zone: "{{ zone }}"
         external_ip: none
@@ -103,7 +89,7 @@
   - name: "Cria Instancia {{ user }}-server2"
     gce:
         instance_names: "{{ user }}-server2"
-        machine_type: "{{ machine_type_small }}"
+        machine_type: "{{ machine_type_node }}"
         image: "{{ image }}"
         zone: "{{ zone }}"
         external_ip: none
@@ -124,10 +110,6 @@
       groupname: gce_instances_ips
     with_items: "{{ gce_node.instance_data }}"
 
-  - name: Grava IP da instancia na variavel ip_publico
-    set_fact:
-      ip_publico: "{{ item.public_ip }}"
-    with_items: "{{ gce_node.instance_data }}"
 
   - name: Espera por SSH habilitado...
     wait_for:
@@ -138,64 +120,21 @@
       timeout: 30
     with_items: "{{ gce_node.instance_data }}"
 
-  - name: "Seta variaveis para proximos passos"
-    set_fact:
-      chave_ssh: "{{ chave_ssh }}"
-      usuario_ssh_gce: "{{ usuario_ssh_gce }}"
-
-  - name: Login no cluster Openshift
-    shell: "/usr/local/bin/oc login https://{{ cluster_openshift }}:8443 --token={{ token_openshift }} --insecure-skip-tls-verify"
-
-  - name: Escolhe projeto
-    shell: "/usr/local/bin/oc project {{ nome_projeto_openshift }}"
-
-  - name: Definindo dominio para web-workshop
-    set_fact:
-     dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
-
-  - name: Cria deployment web_workshop
-    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
-
-  - name: Cria rota para acesso ao web-workshop...
-    shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
-
-
   - name: Adiciona usuario no tower
     tower_user:
       username: "{{ user }}"
       password: redhat
-      email: "{{ email_aluno }}"
+      email: usuario@redhat.com
       first_name: "{{ user }}"
       last_name: RedHat
       state: present
       tower_config_file: "tower_cli.cfg"
 
 
-#  - name: Adiciona usuario na equipe Equipe Inicial
-#    tower_role:
-#      user: "{{ user }}"
-#      target_team: "Equipe Inicial"
-#      role: member
-#      state: present
-#      tower_config_file: "tower_cli.cfg"
-
-
   - name: "Seta variaveis para proximos passos"
     set_fact: 
       chave_ssh: "{{ chave_ssh }}"
       usuario_ssh_gce: "{{ usuario_ssh_gce }}"
-
-  - name: Envia email com dados para acesso
-    mail:
-      host: smtp.gmail.com
-      port: 587
-      username: "{{ email_remetente }}"
-      password: "{{ senha_email }}"
-      to: "<{{ email_aluno }}>"
-      subject: Dados para Workshop
-      body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}.'
-    delegate_to: localhost
-
 
 - name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
   vars:
@@ -206,4 +145,3 @@
   remote_user: "{{ hostvars['localhost']['usuario_ssh_gce'] }}"
   roles:
     - postinstall
-
