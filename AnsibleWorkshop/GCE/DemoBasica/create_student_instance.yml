@@ -7,7 +7,7 @@
     machine_type_small: g1-small
     zone: southamerica-east1-a
     image: centos-7
-    preemptible: true
+    preemptible: false
     tamanho_disco_pequeno: 40
     tamanho_disco_grande: 50
     tamanho_disco_adicional: 50
@@ -154,11 +154,11 @@
      dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
 
   - name: Cria deployment web_workshop
-    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
+#    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.35.198.59.232.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
+    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} IP_CLUSTER_OCP={{ cluster_openshift }} NOME_WORKSHOP={{ nome_workshop  }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.{{ cluster_openshift }}.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
 
   - name: Cria rota para acesso ao web-workshop...
     shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
-
 
   - name: Adiciona usuario no tower
     tower_user:
@@ -170,6 +170,8 @@
       state: present
       tower_config_file: "tower_cli.cfg"
 
+#  - name: Adiciona usuario na equipe Equipe Inicial
+#    shell: "tower-cli team associate --team \"Equipe Inicial\" --user \"{{ user }}\""
 
 #  - name: Adiciona usuario na equipe Equipe Inicial
 #    tower_role:
