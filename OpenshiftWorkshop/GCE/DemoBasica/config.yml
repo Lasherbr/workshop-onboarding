@@ -3,9 +3,9 @@ credentials_file: /home/luciano/gce.json
 project_id: workshopansiblecoreandtower 
 chave_ssh: /home/luciano/.ssh/gce
 usuario_ssh_gce: luciano
-cluster_openshift: 35.198.30.2
-nome_projeto_openshift: workshop
-token_openshift: eeFySh90McU47LKcA9no_2cBJlYjGN20-TA-_jO882w 
+cluster_openshift: https://console.paas.rhbrlab.com
+nome_projeto_openshift: rhbrlab-workshop-alunos
+token_openshift: qkskjsllllllllllSSSSSNaoehumtokenvalidosadsadsaduZL2x0_WwxqjzelFasdlksas0000sAA9NsSfksaawhmiaauIksks
 email_remetente: redhatbsb@gmail.com 
 nome_workshop: workshop-bsb
 endereco_tower: https://35.198.12.187

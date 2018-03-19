@@ -84,20 +84,24 @@
       usuario_ssh_gce: "{{ usuario_ssh_gce }}"
 
   - name: Login no cluster Openshift
-    shell: "/usr/local/bin/oc login https://{{ cluster_openshift }}:8443 --token={{ token_openshift }} --insecure-skip-tls-verify"
+    shell: "/usr/local/bin/oc login {{ cluster_openshift }} --token={{ token_openshift }} --insecure-skip-tls-verify"
 
   - name: Escolhe projeto
     shell: "/usr/local/bin/oc project {{ nome_projeto_openshift }}"
-
-  - name: Definindo dominio para web-workshop
-    set_fact:
-     dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
 
   - name: Cria deployment web_workshop
     shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} IP_CLUSTER_OCP={{ cluster_openshift }} NOME_WORKSHOP={{ nome_workshop  }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY={{ url_wetty }} php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
 
   - name: Cria rota para acesso ao web-workshop...
-    shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
+    shell: "/usr/local/bin/oc expose svc/web-{{ user }}"
+
+  - name: Obtem nome da rota
+    shell: "/usr/local/bin/oc get route web-{{ user }} --no-headers -n {{ nome_projeto_openshift }} | awk '{print $2}'"
+    register: result_dominio_web_workshop
+
+  - name: Definindo dominio para web-workshop
+    debug:
+     msg: "{{ result_dominio_web_workshop }}"
 
   - name: Envia email com dados para acesso
     mail:
@@ -107,7 +111,7 @@
       password: "{{ senha_email }}"
       to: "<{{ email_aluno }}>"
       subject: "Dados para Workshop {{ nome_workshop }}"
-      body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}.'
+      body: 'Seu ambiente de Workshop esta disponivel em {{ result_dominio_web_workshop.stdout }}'
     delegate_to: localhost
 
 #- name: "Configura Hosts seguindo roles... {{ hostvars['localhost']['chave_ssh'] }} "
