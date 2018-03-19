@@ -94,7 +94,7 @@
      dominio_web_workshop: "web-{{ user }}-{{ nome_projeto_openshift }}.{{ cluster_openshift }}.nip.io"
 
   - name: Cria deployment web_workshop
-    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} IP_CLUSTER_OCP={{ cluster_openshift }} NOME_WORKSHOP={{ nome_workshop  }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY=http://wetty-single-wetty-single.{{ cluster_openshift}}.nip.io/ php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
+    shell: "/usr/local/bin/oc new-app TOWER={{ endereco_tower }} IP_CLUSTER_OCP={{ cluster_openshift }} NOME_WORKSHOP={{ nome_workshop  }} ALUNO={{ user }} IP_INSTANCIA={{ ip_publico }} URL_WETTY={{ url_wetty }} php~https://bitbucket.org/redhatbsb/workshop-php.git  --name=web-{{ user }} "
 
   - name: Cria rota para acesso ao web-workshop...
     shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
