@@ -160,15 +160,15 @@
   - name: Cria rota para acesso ao web-workshop...
     shell: "/usr/local/bin/oc expose svc/web-{{ user }} --hostname={{ dominio_web_workshop }}"
 
-  - name: Adiciona usuario no tower
-    tower_user:
-      username: "{{ user }}"
-      password: redhat
-      email: "{{ email_aluno }}"
-      first_name: "{{ user }}"
-      last_name: RedHat
-      state: present
-      tower_config_file: "tower_cli.cfg"
+#  - name: Adiciona usuario no tower
+#    tower_user:
+#      username: "{{ user }}"
+#      password: redhat
+#      email: "{{ email_aluno }}"
+#      first_name: "{{ user }}"
+#      last_name: RedHat
+#      state: present
+#      tower_config_file: "tower_cli.cfg"
 
 #  - name: Adiciona usuario na equipe Equipe Inicial
 #    shell: "tower-cli team associate --team \"Equipe Inicial\" --user \"{{ user }}\""
@@ -195,7 +195,7 @@
       password: "{{ senha_email }}"
       to: "<{{ email_aluno }}>"
       subject: Dados para Workshop
-      body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}.'
+      body: 'Seu ambiente de Workshop esta disponivel em http://{{ dominio_web_workshop }}'
     delegate_to: localhost
 
 

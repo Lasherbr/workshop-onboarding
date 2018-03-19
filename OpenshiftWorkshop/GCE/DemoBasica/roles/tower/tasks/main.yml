@@ -1,7 +1,0 @@
-- name: Create tower team
-  tower_team:
-    name: "Timex"
-    description: "Timex descricao"
-    organization: "Workshop Ansible"
-    state: present
-    tower_config_file: "{{ role_path }}/files/tower_cli.cfg"

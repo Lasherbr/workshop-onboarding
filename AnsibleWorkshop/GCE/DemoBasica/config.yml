@@ -6,6 +6,6 @@ usuario_ssh_gce: luciano
 endereco_tower: https://35.198.12.187
 cluster_openshift: 35.198.30.2
 nome_projeto_openshift: workshop
-token_openshift: 0-bJSfthualhOtv16voY6ApgM308voeankEcaLt51WM
+token_openshift: kdz9DA1Ky8GkzC0Il_jMw5ybMnAfsXlT5BJvQl6-P3s
 email_remetente: redhatbsb@gmail.com
-nome_workshop: workshop-ansible-rio
+nome_workshop: workshop-cabal
